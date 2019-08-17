@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="app">
     <v-content>
        <v-bottom-navigation 
         grow
@@ -10,7 +10,7 @@
           </v-btn>
         </router-link>
   
-        <router-link to="/About">
+        <router-link to="/about">
           <v-btn>
             <v-icon>About</v-icon>
           </v-btn>
@@ -33,3 +33,10 @@ export default Vue.extend({
   }),
 });
 </script>
+<style scoped>
+  #app{
+    margin: 0 auto;
+    padding: 0px 0px;
+    width: 960px
+  }
+</style>

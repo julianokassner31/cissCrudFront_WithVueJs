@@ -1,55 +1,58 @@
 <template>
-  <div>
-    <v-form
-      ref="form"
-      v-model="valid"
-      :lazy-validation="lazy">
-      <v-text-field
-        v-model="firstname"
-        :rules="firstnameRules"
-        label="Nome"
-        required>
-      </v-text-field>
+  <div id="container">
+    <h3>Cadastrar Funcionário</h3>
+    <div id="content">
+      <v-form
+        ref="form"
+        v-model="valid"
+        :lazy-validation="lazy">
+        <v-text-field
+          v-model="employer.firstname"
+          :rules="firstnameRules"
+          label="Nome"
+          required>
+        </v-text-field>
 
-      <v-text-field
-        v-model="lastname"
-        :rules="lastnameRules"
-        label="Sobrenome"
-        required>
-      </v-text-field>
+        <v-text-field
+          v-model="employer.lastname"
+          :rules="lastnameRules"
+          label="Sobrenome"
+          required>
+        </v-text-field>
 
-      <v-text-field
-        v-model="email"
-        :rules="emailRules"
-        label="E-mail"
-        @input="findEmailAlreadyRegistred"
-        required>
-      </v-text-field>
+        <v-text-field
+          v-model="employer.email"
+          :rules="emailRules"
+          label="E-mail"
+          @input="findEmailAlreadyRegistred"
+          required>
+        </v-text-field>
 
-      <v-text-field
-        v-model="pis"
-        :rules="pisRules"
-        label="Pis"
-        required>
-      </v-text-field>
+        <v-text-field
+          v-model="employer.pis"
+          :rules="pisRules"
+          label="Pis"
+          required>
+        </v-text-field>
 
-      <v-btn
-        :disabled="!valid"
-        color="success"
-        class="mr-4"
-        >
-        Cadastrar
-      </v-btn>
+        <v-btn
+          :disabled="!valid"
+          color="success"
+          class="mr-4"
+          @click="cadastrar">
+          Cadastrar
+        </v-btn>
 
-      <v-btn
-        color="error"
-        class="mr-4"
-        >
-        Resetar
-      </v-btn>
-    </v-form>
+        <v-btn
+          color="error"
+          class="mr-4"
+          >
+          Resetar
+        </v-btn>
+      </v-form>
+    </div>  
 
-    <v-data-table
+    <v-data-table id="table"
       :headers="headers"
       :items="employers"
       :items-per-page="5"
@@ -66,6 +69,7 @@ import API from '../model/API';
 
 export default Vue.extend({
   data: () => ({
+    employer: new Employer(),
     employers: [],
     headers: [
         {
@@ -79,8 +83,6 @@ export default Vue.extend({
         { text: 'Pis', value: 'pis'},
       ],
     valid: true,
-    firstname: '',
-    lastname: '',
     firstnameRules: [
       v => !!v || 'Nome é obrigatório',
       v => (v && (v.length > 2 && v.length <= 30)) || 'Nome deve ter entre 2 e 30 caracteres',
@@ -89,12 +91,10 @@ export default Vue.extend({
       v => !!v || 'Sobrenome é obrigatório',
       v => (v && (v.length > 2 && v.length <= 30)) || 'Sobrenome deve ter entre 2 e 30 caracteres',
     ],
-    email: '',
     emailRules: [
       v => !!v || 'Email é obrigatório',
       v => /.+@.+\..+/.test(v) || 'E-mail inválido',
     ],
-    pis: '',
     pisRules: [
       v => !!v || 'Pis é obrigatório',
       v => /\d/.test(v) || 'Somente números',
@@ -107,14 +107,12 @@ export default Vue.extend({
     testEmail(v:any) {
       return /.+@.+\..+/.test(v);
     },
-    // cadastrar () {
-    //   if (this.$refs.form.validate()) {
-    //     this.snackbar = true;
-    //   }
-    // },
-    // reset () {
-    //   this.$refs.form.reset();
-    // },
+    cadastrar() {
+      axios.post(API.employers, this.employer).then(employers => this.employers = employers.data.employers);
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
 
     findEmailAlreadyRegistred(event: string){
       if(this.testEmail(event)){
@@ -127,7 +125,37 @@ export default Vue.extend({
     axios.get(API.employers).then(employers => {
       this.$data.employers = employers.data.employers;
     });
+  },
+  watch: {
+    employers(){
+      const fn = (a:Employer , b:Employer ) =>  a.firstname < b.firstname ? -1 : a.firstname > b.firstname ? 1 : 0;
+      const copyEmployers = <Array<Employer>> Object.assign([],this.employers);
+      return copyEmployers.sort(fn);
+    }
   }
   
 });
 </script>
+
+<style scoped>
+  #container{
+    margin: 0 10px;
+    padding: 40px 0px;
+  }
+  #content{
+    display: flex;
+    flex-wrap: wrap;
+  }
+  #table{
+    margin: 20px 0px;
+  }
+  h3 {
+    text-align: center;
+  }
+
+  form{
+    width: 80%;
+    margin: 0px auto;
+    text-align: center
+  }
+</style>

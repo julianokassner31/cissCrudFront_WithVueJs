@@ -1,7 +1,8 @@
 export default class Employer{
-    firstname: string;
-    lastname: string;
-    email: string;
-    pis:number;
+    firstname = '';
+    lastname = '';
+    email = '';
+    pis = 0;
     constructor(){}
+    
 }
