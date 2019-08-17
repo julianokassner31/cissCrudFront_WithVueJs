@@ -39,14 +39,14 @@
           :disabled="!valid"
           color="success"
           class="mr-4"
-          @click="cadastrar">
+          @click="register">
           Cadastrar
         </v-btn>
 
         <v-btn
           color="error"
           class="mr-4"
-          >
+          @click="resetForm">
           Resetar
         </v-btn>
       </v-form>
@@ -67,7 +67,8 @@
         </v-icon>
         <v-icon
           small
-          >
+          class="mr-2"
+          @click="deleteEmployer(item.id)">
           delete
         </v-icon>
       </template>
@@ -124,25 +125,33 @@ export default Vue.extend({
     testEmail(v:any) {
       return /.+@.+\..+/.test(v);
     },
-    cadastrar() {
-      axios.post(API.employers, this.employer).then(employers => this.employers = employers.data.employers);
+    register() {
+      axios.post(API.employers, this.employer).then(response => this.employers = response.data.employers);
     },
-    reset() {
+    resetForm() {
       this.$refs.form.reset();
     },
     edit(item:Employer){
       this.employer = item;
     },
+    alter(){
+      axios.put(API.employers, this.employer).then(response => {
+          this.$data.employers.push(response.data.employer);
+        });
+    },
+    deleteEmployer(id: string){
+      axios.delete(`${API.employers}/${id}`).then(response => this.employers = response.data.employers);
+    },
     findEmailAlreadyRegistred(event: string){
       if(this.testEmail(event)){
-        axios.get(`http://localhost:8085/employers/email-already-registered?query=${event}`)
+        axios.get(`${API.employers}/email-already-registered?query=${event}`)
         .then(resp => console.log(resp));
       }
     }
   },
   beforeCreate(){
-    axios.get(API.employers).then(employers => {
-      this.$data.employers = employers.data.employers;
+    axios.get(API.employers).then(response => {
+      this.$data.employers = response.data.employers;
     });
   },
   watch: {
