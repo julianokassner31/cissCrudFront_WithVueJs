@@ -57,6 +57,21 @@
       :items="employers"
       :items-per-page="5"
       class="elevation-1">
+
+      <template v-slot:item.acao="{ item }">
+        <v-icon
+          small
+          class="mr-2"
+          @click="edit(item)">
+          edit
+        </v-icon>
+        <v-icon
+          small
+          >
+          delete
+        </v-icon>
+      </template>
+
     </v-data-table>
   </div>
 </template>
@@ -81,6 +96,7 @@ export default Vue.extend({
         { text: 'Sobrenome', value: 'lastname'},
         { text: 'Email', value: 'email'},
         { text: 'Pis', value: 'pis'},
+        { text: 'Ações', value: 'acao'}
       ],
     valid: true,
     firstnameRules: [
@@ -98,6 +114,7 @@ export default Vue.extend({
     pisRules: [
       v => !!v || 'Pis é obrigatório',
       v => /\d/.test(v) || 'Somente números',
+      v => !!v && v.length === 11 || 'Deve conter 11 números' 
     ],
     select: null,
     lazy: false,
@@ -113,7 +130,9 @@ export default Vue.extend({
     reset() {
       this.$refs.form.reset();
     },
-
+    edit(item:Employer){
+      this.employer = item;
+    },
     findEmailAlreadyRegistred(event: string){
       if(this.testEmail(event)){
         axios.get(`http://localhost:8085/employers/email-already-registered?query=${event}`)
